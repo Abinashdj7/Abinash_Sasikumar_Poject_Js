@@ -1,28 +1,38 @@
 const express = require("express");
+const dotenv = require("dotenv");
+const mongoose = require("mongoose");
+const cors = require("cors"); // For CORS
+const userRoutes = require("./routes/Users"); // Import user routes
+const invoiceRoutes=require("./routes/Invoices")
+const productRoutes=require("./routes/Products")
+
+dotenv.config(); // Load environment variables from .env file
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use((req, res, next) => {
-    console.log("Time:", Date.now());
-    next();
-});
+// Middleware
+app.use(cors()); // Enable CORS
+app.use(express.json()); // Parse incoming JSON requests
 
-app.use((req, res, next) => {
-    req.requestTime = Date.now();
-    next();
-});
+// Database connection
+mongoose
+    .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log("MongoDB connected"))
+    .catch((err) => console.log("Error connecting to MongoDB:", err));
 
-app.use((req, res, next) => {
-    req.calculatedValue = 4 * 7;
-    next();
-});
+// Use the user routes
+app.use("/api/users", userRoutes); 
+app.use('/api/invoices', invoiceRoutes);
+app.use("/api/products",productRoutes)
 
+
+// Default route
 app.get("/", (req, res) => {
-    console.log(`Response sent with calculated value: ${req.calculatedValue}`);
-    res.send(`Request Time: ${req.requestTime} | Calculated Value: ${req.calculatedValue}`);
+    res.send("Welcome to the E-commerce API!");
 });
 
+// Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
