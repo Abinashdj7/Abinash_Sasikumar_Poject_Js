@@ -9,7 +9,6 @@ const productRoutes=require("./routes/Products")
 dotenv.config(); // Load environment variables from .env file
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors()); // Enable CORS
@@ -31,7 +30,7 @@ app.use("/api/products",productRoutes)
 app.get("/", (req, res) => {
     res.send("Welcome to the E-commerce API!");
 });
-
+const PORT = process.env.PORT || 5001;
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
