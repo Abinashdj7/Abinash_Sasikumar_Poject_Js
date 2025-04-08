@@ -22,6 +22,10 @@ const productSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true
+    },
+    image: {
+      type: Buffer, 
+      required: true
     }
   },
   { timestamps: true }

@@ -4,14 +4,14 @@ const invoiceSchema = new mongoose.Schema(
   {
     customer: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User', // Assuming you have a User model for customers
+      ref: 'User', 
       required: true
     },
     products: [
       {
         product: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'Product', // Referencing the Product model
+          ref: 'Product', 
           required: true
         },
         quantity: {
@@ -46,7 +46,7 @@ const invoiceSchema = new mongoose.Schema(
       type: Date
     }
   },
-  { timestamps: true } // Automatically adds createdAt and updatedAt fields
+  { timestamps: true } 
 );
 
 const Invoice = mongoose.model('Invoice', invoiceSchema);

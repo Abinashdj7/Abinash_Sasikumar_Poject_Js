@@ -1,9 +1,8 @@
-const Invoice = require('../models/InvoiceModel');  // Adjust path as necessary
+const Invoice = require('../models/InvoiceModel'); 
 
-// Create a new invoice
 const createInvoice = async (req, res) => {
     try {
-      console.log("Request Body:", req.body); // Debugging Step
+      console.log("Request Body:", req.body); 
       const invoice = new Invoice(req.body);
       await invoice.save();
       res.status(201).json(invoice);
@@ -14,10 +13,9 @@ const createInvoice = async (req, res) => {
   };
   
 
-// Get all invoices for a specific user
 const getUserInvoices = async (req, res) => {
   try {
-    const userId = req.params.userId;  // Get the user ID from route params
+    const userId = req.params.userId; 
     const invoices = await Invoice.find({ user: userId });
     if (!invoices) {
       return res.status(404).json({ message: 'Invoices not found' });
@@ -28,7 +26,6 @@ const getUserInvoices = async (req, res) => {
   }
 };
 
-// Get a single invoice by its ID
 const getInvoice = async (req, res) => {
   try {
     const invoiceId = req.params.id;
@@ -42,7 +39,6 @@ const getInvoice = async (req, res) => {
   }
 };
 
-// Update an existing invoice
 const updateInvoice = async (req, res) => {
   try {
     const invoiceId = req.params.id;
@@ -56,7 +52,7 @@ const updateInvoice = async (req, res) => {
   }
 };
 
-// Delete an invoice by its ID
+
 const deleteInvoice = async (req, res) => {
   try {
     const invoiceId = req.params.id;

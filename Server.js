@@ -26,12 +26,12 @@ app.use('/api/invoices', invoiceRoutes);
 app.use("/api/products",productRoutes)
 
 
-// Default route
+
 app.get("/", (req, res) => {
     res.send("Welcome to the E-commerce API!");
 });
 const PORT = process.env.PORT || 5001;
-// Start the server
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
