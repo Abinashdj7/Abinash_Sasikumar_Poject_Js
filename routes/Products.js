@@ -1,12 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../middleware/MulterConfig'); 
-const { createProduct, getProducts, getProductById, updateProduct, deleteProduct } = require('../controllers/ProductController');
+const upload = require('../middleware/MulterConfig');
+const authMiddleware = require('../middleware/Jwt');
 
-router.post('/', upload.single('image'), createProduct);            
-router.get('/', getProducts);            
-router.get('/:id', getProductById);       
-router.put('/:id', upload.single('image'), updateProduct);        
-router.delete('/:id', deleteProduct);  
+const {
+  createProduct,
+  getProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct
+} = require('../controllers/ProductController');
+
+
+router.get('/', getProducts);
+router.get('/:id', getProductById);
+
+router.post('/', authMiddleware, upload.single('image'), createProduct);
+router.put('/:id', authMiddleware, upload.single('image'), updateProduct);
+router.delete('/:id', authMiddleware, deleteProduct);
 
 module.exports = router;

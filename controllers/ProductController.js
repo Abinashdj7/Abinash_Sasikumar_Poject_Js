@@ -1,4 +1,5 @@
 const Product = require('../models/ProductModel');
+const { processImage } = require('../middleware/ImageProcessor') 
 
 const createProduct = async (req, res) => {
   const { name, description, price, stock, category } = req.body;
@@ -15,7 +16,8 @@ const createProduct = async (req, res) => {
       price,
       stock,
       category,
-      image: processedImage, 
+      image: processedImage,
+      createdBy: req.user.id 
     });
 
     await newProduct.save();
@@ -25,15 +27,23 @@ const createProduct = async (req, res) => {
   }
 };
 
-
 const getProducts = async (req, res) => {
   try {
     const products = await Product.find();
 
-    const formattedProducts = products.map(product => ({
-      ...product.toObject(),
-      image: `data:image/jpeg;base64,${product.image.toString('base64')}`
-    }));
+    const formattedProducts = products.map(product => {
+      let formattedImage = null;
+      if (product.image) {
+        formattedImage = `data:image/jpeg;base64,${product.image.toString('base64')}`;
+      } else {
+        formattedImage = null; 
+      }
+
+      return {
+        ...product.toObject(),
+        image: formattedImage
+      };
+    });
 
     res.status(200).json(formattedProducts);
   } catch (error) {
@@ -60,7 +70,6 @@ const getProductById = async (req, res) => {
   }
 };
 
-
 const updateProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -85,4 +94,10 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-module.exports={createProduct,deleteProduct,getProductById,getProducts,updateProduct}
+module.exports = {
+  createProduct,
+  deleteProduct,
+  getProductById,
+  getProducts,
+  updateProduct
+};

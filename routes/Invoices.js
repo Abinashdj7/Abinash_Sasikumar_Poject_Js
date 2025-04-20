@@ -8,16 +8,18 @@ const {
   deleteInvoice
 } = require('../controllers/InvoiceController');
 
+const authMiddleware = require("../middleware/Jwt")
 
-router.post('/', createInvoice);
+
+router.post('/',authMiddleware,createInvoice);
 
 
-router.get('/', getUserInvoices);
+router.get('/',authMiddleware, getUserInvoices);
 
-router.get('/:id', getInvoice);
+router.get('/:id',authMiddleware, getInvoice);
 
-router.put('/:id', updateInvoice);
+router.put('/:id',authMiddleware, updateInvoice);
 
-router.delete('/:id', deleteInvoice);
+router.delete('/:id',authMiddleware,deleteInvoice);
 
 module.exports = router;

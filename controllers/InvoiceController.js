@@ -1,25 +1,22 @@
-const Invoice = require('../models/InvoiceModel'); 
+const Invoice = require('../models/InvoiceModel');
 
 const createInvoice = async (req, res) => {
-    try {
-      console.log("Request Body:", req.body); 
-      const invoice = new Invoice(req.body);
-      await invoice.save();
-      res.status(201).json(invoice);
-    } catch (error) {
-      console.error("Error creating invoice:", error);
-      res.status(400).json({ message: error.message });
-    }
-  };
-  
+  try {
+    const invoice = new Invoice({
+      ...req.body,
+      user: req.user.id
+    });
+    await invoice.save();
+    res.status(201).json(invoice);
+  } catch (error) {
+    console.error("Error creating invoice:", error);
+    res.status(400).json({ message: error.message });
+  }
+};
 
 const getUserInvoices = async (req, res) => {
   try {
-    const userId = req.params.userId; 
-    const invoices = await Invoice.find({ user: userId });
-    if (!invoices) {
-      return res.status(404).json({ message: 'Invoices not found' });
-    }
+    const invoices = await Invoice.find({ user: req.user.id }).populate('items.product');
     res.status(200).json(invoices);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -28,10 +25,9 @@ const getUserInvoices = async (req, res) => {
 
 const getInvoice = async (req, res) => {
   try {
-    const invoiceId = req.params.id;
-    const invoice = await Invoice.findById(invoiceId);
-    if (!invoice) {
-      return res.status(404).json({ message: 'Invoice not found' });
+    const invoice = await Invoice.findById(req.params.id).populate('items.product');
+    if (!invoice || invoice.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Access denied' });
     }
     res.status(200).json(invoice);
   } catch (error) {
@@ -41,29 +37,36 @@ const getInvoice = async (req, res) => {
 
 const updateInvoice = async (req, res) => {
   try {
-    const invoiceId = req.params.id;
-    const updatedInvoice = await Invoice.findByIdAndUpdate(invoiceId, req.body, { new: true });
-    if (!updatedInvoice) {
-      return res.status(404).json({ message: 'Invoice not found' });
+    const invoice = await Invoice.findById(req.params.id);
+    if (!invoice || invoice.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Access denied' });
     }
+
+    const updatedInvoice = await Invoice.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.status(200).json(updatedInvoice);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-
 const deleteInvoice = async (req, res) => {
   try {
-    const invoiceId = req.params.id;
-    const deletedInvoice = await Invoice.findByIdAndDelete(invoiceId);
-    if (!deletedInvoice) {
-      return res.status(404).json({ message: 'Invoice not found' });
+    const invoice = await Invoice.findById(req.params.id);
+    if (!invoice || invoice.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Access denied' });
     }
+
+    await Invoice.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: 'Invoice deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-module.exports={createInvoice,deleteInvoice,getUserInvoices,getInvoice,updateInvoice}
+module.exports = {
+  createInvoice,
+  deleteInvoice,
+  getUserInvoices,
+  getInvoice,
+  updateInvoice
+};
