@@ -1,5 +1,6 @@
 const Product = require('../models/ProductModel');
-const { processImage } = require('../middleware/ImageProcessor') 
+const { processImage } = require('../middleware/ImageProcessor')
+const path = require('path');
 
 const createProduct = async (req, res) => {
   const { name, description, price, stock, category } = req.body;
@@ -9,23 +10,33 @@ const createProduct = async (req, res) => {
   }
 
   try {
-    const processedImage = await processImage(req.file.buffer);
+    // Generate paths for original and optimized images
+    const originalImagePath = req.file.path;
+    const optimizedImagePath = path.join(__dirname, '../middleware/uploads', `${Date.now()}-optimized.webp`);
+
+    // Process the image (resize and convert)
+    await processImage(originalImagePath, optimizedImagePath);
+
     const newProduct = new Product({
       name,
       description,
       price,
       stock,
       category,
-      image: processedImage,
+      image: optimizedImagePath,  // Save the path to the optimized image
       createdBy: req.user.id 
     });
 
     await newProduct.save();
     res.status(201).json(newProduct);
   } catch (error) {
+    console.error('Error processing image:', error);
     res.status(500).json({ message: error.message });
   }
 };
+
+
+
 
 const getProducts = async (req, res) => {
   try {
@@ -34,9 +45,7 @@ const getProducts = async (req, res) => {
     const formattedProducts = products.map(product => {
       let formattedImage = null;
       if (product.image) {
-        formattedImage = `data:image/jpeg;base64,${product.image.toString('base64')}`;
-      } else {
-        formattedImage = null; 
+        formattedImage = product.image;
       }
 
       return {

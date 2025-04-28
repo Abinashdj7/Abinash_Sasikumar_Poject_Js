@@ -5,6 +5,7 @@ const cors = require("cors"); // For CORS
 const userRoutes = require("./routes/Users"); // Import user routes
 const invoiceRoutes=require("./routes/Invoices")
 const productRoutes=require("./routes/Products")
+const path=require('path')
 
 dotenv.config(); // Load environment variables from .env file
 
@@ -13,6 +14,7 @@ const app = express();
 // Middleware
 app.use(cors()); // Enable CORS
 app.use(express.json()); // Parse incoming JSON requests
+app.use('/uploads', express.static(path.join(__dirname, 'middleware/uploads')));
 
 // Database connection
 mongoose
