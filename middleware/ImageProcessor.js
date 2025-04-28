@@ -1,35 +1,17 @@
-const sharp = require("sharp");
-const path = require("path");
-const fs = require("fs");
+const sharp = require('sharp');
 
-/**
- * @param {string} imagePath 
- * @param {string} outputPath 
- */
-const optimizeImage = async (imagePath, outputPath) => {
+const processImage = async (imageBuffer) => {
   try {
-    await sharp(imagePath)
-      .resize(800)  
+    const processedImage = await sharp(imageBuffer)
+      .resize(800)
       .webp({ quality: 75 }) 
-      .toFile(outputPath); 
-    console.log("Image optimized and saved successfully!");
+      .toBuffer(); 
+
+    return processedImage;
   } catch (error) {
-    console.error("Error processing image:", error);
-    throw error;
+    console.error('Error processing image:', error);
+    throw new Error('Error processing image');
   }
 };
 
-/**
- * @param {string} imagePath 
- */
-const deleteOriginalImage = (imagePath) => {
-  fs.unlink(imagePath, (err) => {
-    if (err) {
-      console.error("Error deleting the original image:", err);
-    } else {
-      console.log("Original image deleted.");
-    }
-  });
-};
-
-module.exports = { optimizeImage, deleteOriginalImage };
+module.exports = { processImage };
